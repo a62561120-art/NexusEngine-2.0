@@ -1,0 +1,50 @@
+name: Build Nexus Engine APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install NDK
+      run: sdkmanager "ndk;25.2.9519653" "cmake;3.22.1"
+
+    - name: Build APK
+      working-directory: android
+      run: |
+        chmod +x gradlew 2>/dev/null || true
+        gradle app:assembleRelease \
+          -Pandroid.ndkVersion=25.2.9519653
+
+    - name: Sign APK
+      run: |
+        keytool -genkeypair -v -keystore nexus.keystore -alias nexus \
+          -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass nexus123 -keypass nexus123 \
+          -dname "CN=NexusEngine,OU=Dev,O=Nexus,L=City,ST=State,C=US"
+        BUILDTOOLS=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)
+        $BUILDTOOLS/apksigner sign \
+          --ks nexus.keystore \
+          --ks-pass pass:nexus123 \
+          --out NexusEngine2.apk \
+          android/app/build/outputs/apk/release/app-release-unsigned.apk
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: NexusEngine2
+        path: NexusEngine2.apk
