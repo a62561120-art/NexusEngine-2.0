@@ -575,6 +575,10 @@ static bool InitEGL(ANativeWindow* window) {
 static void InitEngine(ANativeWindow* window) {
     LOGI("InitEngine start");
     if (!InitEGL(window)) { LOGE("EGL failed"); return; }
+    // Render a frame immediately so Android doesn't kill us
+    glClearColor(0.12f,0.12f,0.18f,1.f);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    eglSwapBuffers(g_eglDisplay,g_eglSurface);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io=ImGui::GetIO();
