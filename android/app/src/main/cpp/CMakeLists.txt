@@ -3,6 +3,8 @@ project(nexusengine)
 
 add_library(nexusengine SHARED
     main_android.cpp
+    Engine/Renderer/Camera.cpp
+    Engine/Renderer/Light.cpp
     imgui/imgui.cpp
     imgui/imgui_draw.cpp
     imgui/imgui_widgets.cpp
