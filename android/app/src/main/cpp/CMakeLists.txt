@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(nexusengine)
 
+# native_app_glue
+add_library(native_app_glue STATIC
+    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
+)
+target_include_directories(native_app_glue PUBLIC
+    ${ANDROID_NDK}/sources/android/native_app_glue
+)
+
 add_library(nexusengine SHARED
     main_android.cpp
     Engine/Renderer/Camera.cpp
@@ -20,13 +28,10 @@ target_include_directories(nexusengine PRIVATE
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
-add_library(native_app_glue STATIC
-    ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c
-)
-
 target_compile_definitions(nexusengine PRIVATE ANDROID IMGUI_IMPL_OPENGL_ES3)
 
 target_link_libraries(nexusengine
     native_app_glue
     android log EGL GLESv3 m
+    -Wl,--whole-archive native_app_glue -Wl,--no-whole-archive
 )
