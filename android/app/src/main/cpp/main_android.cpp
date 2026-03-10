@@ -449,7 +449,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     ImGui::TextColored(ImVec4(0.2f,0.6f,1.f,1.f),"NEXUS ENGINE 2.0");
     ImGui::SameLine(0,20);
     if(ImGui::BeginMenu("File")) {
-        if(ImGui::MenuItem("New Scene")) { scene->Clear(); }
+        if(ImGui::MenuItem("New Scene")) { }
         if(ImGui::MenuItem("Add Cube")) {
             GameObject* nb=scene->CreateGameObject("Cube");
             nb->GetTransform()->SetPosition({0,0.5f,0});
