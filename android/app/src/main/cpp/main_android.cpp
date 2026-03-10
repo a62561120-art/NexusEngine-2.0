@@ -3,7 +3,6 @@
 // ============================================================
 
 // MUST be first — overrides Logger before any engine header
-#include "AndroidLogger.h"
 
 #include <android_native_app_glue.h>
 #include <EGL/egl.h>

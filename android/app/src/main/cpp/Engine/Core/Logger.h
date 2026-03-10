@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include <iostream>
-#include <sstream>
+#include <android/log.h>
+
 #include <ctime>
 
 namespace Nova {
@@ -29,9 +29,9 @@ public:
         std::string prefix = LevelPrefix(level);
         std::string output = "[" + prefix + "][" + category + "] " + msg;
         if (level >= LogLevel::Error)
-            std::cerr << output << "\n";
+            __android_log_print(ANDROID_LOG_ERROR, "NexusEngine", "%s", output.c_str());
         else
-            std::cout << output << "\n";
+            __android_log_print(ANDROID_LOG_INFO, "NexusEngine", "%s", output.c_str());
     }
 
     void Trace(const std::string& cat, const std::string& msg)   { Log(LogLevel::Trace,   cat, msg); }
