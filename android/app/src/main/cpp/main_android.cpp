@@ -656,6 +656,7 @@ static void RenderFrame() {
 }
 
 static int32_t HandleInput(android_app* app, AInputEvent* event) {
+    if (!g_initialized || !g_rendererReady) return 0;
     if (ImGui_ImplAndroid_HandleInputEvent(event)) return 1;
 
     // Viewport touch drag = look around
