@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <android/log.h>
+#include <sstream>
 
 #include <ctime>
 
