@@ -131,6 +131,9 @@ static Scene*           g_scene    = nullptr;
 static GameObject*      g_selected = nullptr;
 static float g_lastTX=0, g_lastTY=0;
 static bool  g_viewportDrag=false;
+static float g_joyBaseX=0,g_joyBaseY=0;
+static float g_joyDX=0,g_joyDY=0;
+static bool  g_joyActive=false;
 
 // ============================================================
 //  Timing
@@ -529,27 +532,39 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGui::End();
     }
 
-    float padSz=160.f;
-    ImGui::SetNextWindowPos(ImVec2(0,(float)h-padSz-10));
-    ImGui::SetNextWindowSize(ImVec2(padSz+20,padSz+20));
-    ImGui::Begin("MOVE",nullptr,
+    // Joystick - drawn with ImDrawList
+    float joySize=140.f;
+    ImGui::SetNextWindowPos(ImVec2(10,(float)h-joySize-10));
+    ImGui::SetNextWindowSize(ImVec2(joySize,joySize));
+    ImGui::SetNextWindowBgAlpha(0.3f);
+    ImGui::Begin("##joy",nullptr,
         ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|
-        ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar);
-    ImGui::Text("MOVE");
-    float bsz=50.f;
-    ImGui::SetCursorPos(ImVec2(bsz,5));
-    ImGui::Button("^##mf",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveF=true; else edCam.moveF=false;
-    ImGui::SetCursorPos(ImVec2(0,bsz));
-    ImGui::Button("<##ml",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveL=true;
-    ImGui::SameLine();
-    ImGui::Button("v##md",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveD=true;
-    ImGui::SameLine();
-    ImGui::Button(">##mr",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveR=true;
-    ImGui::SetCursorPos(ImVec2(0,bsz*2));
-    ImGui::Button("Up##mu",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveU=true;
-    ImGui::SameLine();
-    ImGui::Button("Dn##mb",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveB=true;
+        ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar|
+        ImGuiWindowFlags_NoInputs);
+    ImDrawList* dl=ImGui::GetWindowDrawList();
+    ImVec2 wp=ImGui::GetWindowPos();
+    float cx=wp.x+joySize*0.5f,cy=wp.y+joySize*0.5f;
+    float outerR=joySize*0.44f,innerR=joySize*0.17f;
+    dl->AddCircle(ImVec2(cx,cy),outerR,IM_COL32(80,140,255,150),32,2.5f);
+    float kx=cx,ky=cy;
+    if(g_joyActive){
+        float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
+        float clamp=std::min(len,outerR);
+        if(len>0){kx+=g_joyDX/len*clamp;ky+=g_joyDY/len*clamp;}
+    }
+    dl->AddCircleFilled(ImVec2(kx,ky),innerR,IM_COL32(100,180,255,220));
     ImGui::End();
+    // Apply joystick to camera movement
+    if(g_joyActive){
+        float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
+        if(len>12.f){
+            float nx=g_joyDX/len,ny=g_joyDY/len;
+            if(ny<-0.3f) edCam.moveF=true;
+            if(ny> 0.3f) edCam.moveB=true;
+            if(nx<-0.3f) edCam.moveL=true;
+            if(nx> 0.3f) edCam.moveR=true;
+        }
+    }
 
 }
 
@@ -664,6 +679,15 @@ static int32_t HandleInput(android_app* app, AInputEvent* event) {
         int action=AMotionEvent_getAction(event)&AMOTION_EVENT_ACTION_MASK;
         float tx=AMotionEvent_getX(event,0);
         float ty=AMotionEvent_getY(event,0);
+        // Joystick zone bottom-left
+        bool inJoy=(tx<160.f&&ty>(float)g_vpH-160.f);
+        if(action==AMOTION_EVENT_ACTION_DOWN&&inJoy){
+            g_joyActive=true;g_joyBaseX=tx;g_joyBaseY=ty;g_joyDX=0;g_joyDY=0;
+        } else if(action==AMOTION_EVENT_ACTION_MOVE&&g_joyActive){
+            g_joyDX=tx-g_joyBaseX;g_joyDY=ty-g_joyBaseY;
+        } else if(action==AMOTION_EVENT_ACTION_UP&&g_joyActive){
+            g_joyActive=false;g_joyDX=0;g_joyDY=0;
+        }
         bool inUI=(tx<200&&ty>50&&ty<g_vpH*0.5f+50)||
                   (tx>g_vpW-210&&ty>50&&ty<g_vpH*0.5f+50)||
                   (tx<200&&ty>g_vpH-180)||
