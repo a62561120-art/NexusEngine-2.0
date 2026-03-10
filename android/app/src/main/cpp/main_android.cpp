@@ -563,7 +563,7 @@ static bool  g_viewportDrag=false;
 
 static bool InitEGL(ANativeWindow* window) {
     g_eglDisplay=eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    eglInitialize(g_eglDisplay,0,0);
+    EGLint major, minor; eglInitialize(g_eglDisplay,&major,&minor);
     const EGLint attribs[]={
         EGL_RENDERABLE_TYPE,EGL_OPENGL_ES3_BIT,
         EGL_SURFACE_TYPE,EGL_WINDOW_BIT,
@@ -583,7 +583,9 @@ static bool InitEGL(ANativeWindow* window) {
 }
 
 static void InitEngine(ANativeWindow* window) {
+    LOGI("InitEngine start");
     InitEGL(window);
+    LOGI("EGL done");
 
     // ImGui
     IMGUI_CHECKVERSION();
@@ -599,8 +601,11 @@ static void InitEngine(ANativeWindow* window) {
     InitRenderer(g_vpW,g_vpH);
 
     // Scene
+    LOGI("Creating scene");
     g_scene=new Scene();
+    LOGI("Building demo");
     BuildDemoScene(g_scene);
+    LOGI("Scene done");
 
     // Camera
     g_edCam.Init(g_scene,(float)g_vpW/(float)g_vpH);
