@@ -487,6 +487,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         if (sel) ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(1.f,0.8f,0.2f,1.f));
         if (ImGui::Button(go->GetName().c_str(),ImVec2(-1,40))) selected=go;
         if (sel) ImGui::PopStyleColor();
+        ImGui::PopID();
     });
     if (ImGui::Button("+ Cube",ImVec2(-1,40))) {
         GameObject* nb=scene->CreateGameObject("NewCube");
@@ -642,6 +643,7 @@ static void RenderFrame() {
 
     DrawEditorUI(g_scene,g_edCam,g_selected,g_vpW,g_vpH);
     g_edCam.Update(dt);
+    g_scene->Update(dt);
     ImGui::Render();
 
     glViewport(0,0,g_vpW,g_vpH);
