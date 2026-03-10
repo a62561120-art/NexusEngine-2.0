@@ -17,8 +17,8 @@
 #include <time.h>
 
 #define LOG_TAG "NexusEngine"
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) do { __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__); FILE*_f=fopen("/sdcard/nexus_log.txt","a"); if(_f){fprintf(_f,"I: "); fprintf(_f,__VA_ARGS__); fprintf(_f,"\n"); fclose(_f);} } while(0)
+#define LOGE(...) do { __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__); FILE*_f=fopen("/sdcard/nexus_log.txt","a"); if(_f){fprintf(_f,"E: "); fprintf(_f,__VA_ARGS__); fprintf(_f,"\n"); fclose(_f);} } while(0)
 
 // ---- ImGui ----
 #include "imgui/imgui.h"
