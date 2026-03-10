@@ -456,7 +456,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         if (std::string(go->GetName())=="EditorCamera") return;
         bool sel=(go==selected);
         if (sel) ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(1.f,0.8f,0.2f,1.f));
-        if (ImGui::Button(go->GetName(), ImVec2(-1,40)))
+        if (ImGui::Button(go->GetName().c_str(), ImVec2(-1,40)))
             selected=go;
         if (sel) ImGui::PopStyleColor();
     });
@@ -479,7 +479,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGui::SetNextWindowPos(ImVec2((float)w-190,50));
         ImGui::SetNextWindowSize(ImVec2(190,(float)h*0.5f));
         ImGui::Begin("Inspector",nullptr,ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoResize);
-        ImGui::Text("%s", selected->GetName());
+        ImGui::Text("%s", selected->GetName().c_str());
         ImGui::Separator();
         Transform* tr=selected->GetTransform();
         Vector3 pos=tr->GetPosition();
