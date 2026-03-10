@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace 'com.nexusengine.app'
-    compileSdk 33
+    compileSdk 35
     defaultConfig {
         applicationId 'com.nexusengine.app'
         minSdk 24
-        targetSdk 33
+        targetSdk 35
         versionCode 1
         versionName '2.0'
         externalNativeBuild {
