@@ -447,6 +447,31 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar|
         ImGuiWindowFlags_NoBackground);
     ImGui::TextColored(ImVec4(0.2f,0.6f,1.f,1.f),"NEXUS ENGINE 2.0");
+    ImGui::SameLine(0,20);
+    if(ImGui::BeginMenu("File")) {
+        if(ImGui::MenuItem("New Scene")) { scene->Clear(); }
+        if(ImGui::MenuItem("Add Cube")) {
+            GameObject* nb=scene->CreateGameObject("Cube");
+            nb->GetTransform()->SetPosition({0,0.5f,0});
+            MeshRenderer* mr=nb->AddComponent<MeshRenderer>();
+            mr->SetMeshData(PrimitiveMesh::CreateCube(1.f));
+            mr->SetMaterial(Material::Colored({0.6f,0.6f,0.6f}));
+        }
+        if(ImGui::MenuItem("Add Sphere")) {
+            GameObject* nb=scene->CreateGameObject("Sphere");
+            nb->GetTransform()->SetPosition({0,0.5f,0});
+            MeshRenderer* mr=nb->AddComponent<MeshRenderer>();
+            mr->SetMeshData(PrimitiveMesh::CreateSphere(0.5f,24,24));
+            mr->SetMaterial(Material::Colored({0.3f,0.5f,1.f}));
+        }
+        ImGui::EndMenu();
+    }
+    ImGui::SameLine(0,10);
+    if(ImGui::BeginMenu("View")) {
+        ImGui::MenuItem("Hierarchy", nullptr, nullptr, false);
+        ImGui::MenuItem("Inspector", nullptr, nullptr, false);
+        ImGui::EndMenu();
+    }
     ImGui::SameLine(0,30);
     ImGui::Text("FPS: %.0f", fps);
     ImGui::End();
@@ -454,8 +479,10 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     ImGui::SetNextWindowPos(ImVec2(0,50));
     ImGui::SetNextWindowSize(ImVec2(180,(float)h*0.5f));
     ImGui::Begin("Hierarchy",nullptr,ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoResize);
+    int goIdx=0;
     scene->ForEach([&](GameObject* go){
         if (go->GetName()=="EditorCamera") return;
+        ImGui::PushID(goIdx++);
         bool sel=(go==selected);
         if (sel) ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(1.f,0.8f,0.2f,1.f));
         if (ImGui::Button(go->GetName().c_str(),ImVec2(-1,40))) selected=go;
@@ -510,34 +537,19 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     ImGui::Text("MOVE");
     float bsz=50.f;
     ImGui::SetCursorPos(ImVec2(bsz,5));
-    if(ImGui::Button("^##mf",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveF=true;
+    ImGui::Button("^##mf",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveF=true; else edCam.moveF=false;
     ImGui::SetCursorPos(ImVec2(0,bsz));
-    if(ImGui::Button("<##ml",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveL=true;
+    ImGui::Button("<##ml",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveL=true;
     ImGui::SameLine();
-    if(ImGui::Button("v##md",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveD=true;
+    ImGui::Button("v##md",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveD=true;
     ImGui::SameLine();
-    if(ImGui::Button(">##mr",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveR=true;
+    ImGui::Button(">##mr",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveR=true;
     ImGui::SetCursorPos(ImVec2(0,bsz*2));
-    if(ImGui::Button("Up##mu",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveU=true;
+    ImGui::Button("Up##mu",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveU=true;
     ImGui::SameLine();
-    if(ImGui::Button("Dn##mb",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.moveB=true;
+    ImGui::Button("Dn##mb",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveB=true;
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2((float)w-padSz-20,(float)h-padSz-10));
-    ImGui::SetNextWindowSize(ImVec2(padSz+20,padSz+20));
-    ImGui::Begin("LOOK",nullptr,
-        ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|
-        ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar);
-    ImGui::Text("LOOK");
-    ImGui::SetCursorPos(ImVec2(bsz,5));
-    if(ImGui::Button("^##lu",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.lookU=true;
-    ImGui::SetCursorPos(ImVec2(0,bsz));
-    if(ImGui::Button("<##ll",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.lookL=true;
-    ImGui::SameLine();
-    if(ImGui::Button("v##ld",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.lookD=true;
-    ImGui::SameLine();
-    if(ImGui::Button(">##lr",ImVec2(bsz,bsz))&&ImGui::IsItemActive()) edCam.lookR=true;
-    ImGui::End();
 }
 
 // ============================================================
