@@ -284,7 +284,7 @@ public:
 
             // STEP 2: Get camera right flattened to ground plane
             // right = forward cross up (world up = 0,1,0)
-            Vector3 camRight={camFwd.z,0.f,-camFwd.x};
+            Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
 
             // STEP 3: joystick input
             // joyX = g_joyDX/100: positive = finger went RIGHT
