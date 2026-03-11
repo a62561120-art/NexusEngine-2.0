@@ -301,8 +301,8 @@ public:
             if(inputLen>1.f){moveForward/=inputLen;moveRight/=inputLen;}
 
             // STEP 5: apply movement in camera-relative space
-            pos.x += (camFwd.x*moveForward + camRight.x*moveRight)*spd*3.f;
-            pos.z += (camFwd.z*moveForward + camRight.z*moveRight)*spd*3.f;
+            pos.x += (camFwd.x*moveRight + camRight.x*moveForward)*spd*3.f;
+            pos.z += (camFwd.z*moveRight + camRight.z*moveForward)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
