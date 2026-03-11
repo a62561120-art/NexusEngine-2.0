@@ -274,7 +274,7 @@ public:
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
-        if(joyX!=0||joyY!=0){pos=pos+fwd*(joyY*spd*3.f);pos=pos+right*(joyX*spd*3.f);}
+        if(joyX!=0||joyY!=0){pos=pos+fwd*(-joyY*spd*3.f)+right*(joyX*spd*3.f);}
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
         if(moveL) pos=pos-right*spd;
