@@ -19,6 +19,8 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      env:
+        FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     - name: Install NDK
       run: sdkmanager "ndk;25.2.9519653" "cmake;3.22.1"
