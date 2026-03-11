@@ -274,7 +274,16 @@ public:
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
-        if(joyX!=0||joyY!=0){pos=pos+fwd*(-joyY*spd*3.f)+right*(joyX*spd*3.f);}
+        if(joyX!=0||joyY!=0){
+            // Flatten forward vector - remove Y so movement is always horizontal
+            Vector3 flatFwd=GetFwd();
+            flatFwd.y=0.f;
+            float flen=sqrtf(flatFwd.x*flatFwd.x+flatFwd.z*flatFwd.z);
+            if(flen>0.001f){flatFwd.x/=flen;flatFwd.z/=flen;}
+            // Recalculate right from flattened forward
+            Vector3 flatRight=flatFwd.Cross({0,1,0}).Normalized();
+            pos=pos+flatFwd*(-joyY*spd*3.f)+flatRight*(joyX*spd*3.f);
+        }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
         if(moveL) pos=pos-right*spd;
