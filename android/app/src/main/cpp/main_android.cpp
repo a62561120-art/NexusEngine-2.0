@@ -533,7 +533,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     }
 
     // Joystick - drawn with ImDrawList
-    float joySize=140.f;
+    float joySize=200.f;
     ImGui::SetNextWindowPos(ImVec2(10,(float)h-joySize-10));
     ImGui::SetNextWindowSize(ImVec2(joySize,joySize));
     ImGui::SetNextWindowBgAlpha(0.3f);
@@ -559,10 +559,10 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
         if(len>12.f){
             float nx=g_joyDX/len,ny=g_joyDY/len;
-            if(ny<-0.3f) edCam.moveF=true;
-            if(ny> 0.3f) edCam.moveB=true;
-            if(nx<-0.3f) edCam.moveL=true;
-            if(nx> 0.3f) edCam.moveR=true;
+            if(ny<-0.3f) edCam.moveF=true;  // up = forward
+            if(ny> 0.3f) edCam.moveB=true;  // down = backward
+            if(nx> 0.3f) edCam.moveR=true;  // right = strafe right
+            if(nx<-0.3f) edCam.moveL=true;  // left = strafe left
         }
     }
 
@@ -680,7 +680,7 @@ static int32_t HandleInput(android_app* app, AInputEvent* event) {
         float tx=AMotionEvent_getX(event,0);
         float ty=AMotionEvent_getY(event,0);
         // Joystick zone bottom-left
-        bool inJoy=(tx<160.f&&ty>(float)g_vpH-160.f);
+        bool inJoy=(tx<220.f&&ty>(float)g_vpH-220.f);
         if(action==AMOTION_EVENT_ACTION_DOWN&&inJoy){
             g_joyActive=true;g_joyBaseX=tx;g_joyBaseY=ty;g_joyDX=0;g_joyDY=0;
         } else if(action==AMOTION_EVENT_ACTION_MOVE&&g_joyActive){
