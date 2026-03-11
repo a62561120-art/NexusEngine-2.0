@@ -268,11 +268,13 @@ public:
         ApplyRot();
     }
 
+    float joyX=0,joyY=0;
     void Update(float dt) {
         if (!go||!cam) return;
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
+        if(joyX!=0||joyY!=0){pos=pos+fwd*(-joyY*spd*3.f);pos=pos+right*(joyX*spd*3.f);}
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
         if(moveL) pos=pos-right*spd;
@@ -286,6 +288,7 @@ public:
         if(lookU){pitch=std::min(pitch+ls,89.f);ApplyRot();}
         if(lookD){pitch=std::max(pitch-ls,-89.f);ApplyRot();}
         moveF=moveB=moveL=moveR=moveU=moveD=false;
+        joyX=0;joyY=0;
         lookL=lookR=lookU=lookD=false;
     }
 
@@ -559,10 +562,8 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
         if(len>12.f){
             float nx=g_joyDX/len,ny=g_joyDY/len;
-            if(nx<-0.3f) edCam.moveF=true;  // left = forward
-            if(nx> 0.3f) edCam.moveB=true;  // right = backward
-            if(ny> 0.3f) edCam.moveR=true;  // down = strafe right
-            if(ny<-0.3f) edCam.moveL=true;  // up = strafe left
+            edCam.joyX=std::max(-1.f,std::min(1.f,g_joyDX/100.f));
+            edCam.joyY=std::max(-1.f,std::min(1.f,g_joyDY/100.f));
         }
     }
 
