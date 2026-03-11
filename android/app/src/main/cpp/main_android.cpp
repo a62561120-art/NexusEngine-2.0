@@ -290,7 +290,7 @@ public:
     }
 
     void OnTouchDrag(float dx, float dy) {
-        yaw+=dx*lookSens; pitch-=dy*lookSens;
+        yaw-=dx*lookSens; pitch-=dy*lookSens;
         pitch=std::max(-89.f,std::min(89.f,pitch));
         ApplyRot();
     }
@@ -559,10 +559,10 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
         if(len>12.f){
             float nx=g_joyDX/len,ny=g_joyDY/len;
-            if(ny<-0.3f) edCam.moveF=true;  // up = forward
-            if(ny> 0.3f) edCam.moveB=true;  // down = backward
-            if(nx> 0.3f) edCam.moveR=true;  // right = strafe right
-            if(nx<-0.3f) edCam.moveL=true;  // left = strafe left
+            if(nx<-0.3f) edCam.moveF=true;  // left = forward
+            if(nx> 0.3f) edCam.moveB=true;  // right = backward
+            if(ny> 0.3f) edCam.moveR=true;  // down = strafe right
+            if(ny<-0.3f) edCam.moveL=true;  // up = strafe left
         }
     }
 
