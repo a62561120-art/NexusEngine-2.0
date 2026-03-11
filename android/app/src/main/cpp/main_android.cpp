@@ -274,15 +274,35 @@ public:
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
-        if(joyX!=0||joyY!=0){
-            // Flatten forward vector - remove Y so movement is always horizontal
-            Vector3 flatFwd=GetFwd();
-            flatFwd.y=0.f;
-            float flen=sqrtf(flatFwd.x*flatFwd.x+flatFwd.z*flatFwd.z);
-            if(flen>0.001f){flatFwd.x/=flen;flatFwd.z/=flen;}
-            // Recalculate right from flattened forward
-            Vector3 flatRight=flatFwd.Cross({0,1,0}).Normalized();
-            pos=pos+flatFwd*(-joyY*spd*3.f)+flatRight*(joyX*spd*3.f);
+        if(joyX!=0.f||joyY!=0.f){
+            // STEP 1: Get camera forward flattened to ground plane
+            Vector3 camFwd=GetFwd();
+            camFwd.y=0.f;
+            float fwdLen=sqrtf(camFwd.x*camFwd.x+camFwd.z*camFwd.z);
+            if(fwdLen<0.001f){camFwd={0,0,-1};}
+            else{camFwd.x/=fwdLen;camFwd.z/=fwdLen;}
+
+            // STEP 2: Get camera right flattened to ground plane
+            // right = forward cross up (world up = 0,1,0)
+            Vector3 camRight={camFwd.z,0.f,-camFwd.x};
+
+            // STEP 3: joystick input
+            // joyX = g_joyDX/100: positive = finger went RIGHT
+            // joyY = g_joyDY/100: positive = finger went DOWN (screen coords)
+            // We want: joystick UP (joyY negative) = move FORWARD
+            //          joystick DOWN (joyY positive) = move BACKWARD
+            //          joystick RIGHT (joyX positive) = move RIGHT
+            //          joystick LEFT (joyX negative) = move LEFT
+            float moveForward = -joyY; // invert Y because screen Y is flipped
+            float moveRight   =  joyX;
+
+            // STEP 4: normalize diagonal so speed is consistent
+            float inputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
+            if(inputLen>1.f){moveForward/=inputLen;moveRight/=inputLen;}
+
+            // STEP 5: apply movement in camera-relative space
+            pos.x += (camFwd.x*moveForward + camRight.x*moveRight)*spd*3.f;
+            pos.z += (camFwd.z*moveForward + camRight.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
