@@ -274,35 +274,25 @@ public:
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
-        if(joyX!=0.f||joyY!=0.f){
-            // STEP 1: Get camera forward flattened to ground plane
+        float deadzone=0.1f;
+        float inputMagnitude=sqrtf(joyX*joyX+joyY*joyY);
+        if(inputMagnitude>deadzone){
             Vector3 camFwd=GetFwd();
             camFwd.y=0.f;
             float fwdLen=sqrtf(camFwd.x*camFwd.x+camFwd.z*camFwd.z);
-            if(fwdLen<0.001f){camFwd={0,0,-1};}
+            if(fwdLen<0.001f){camFwd={0.f,0.f,-1.f};}
             else{camFwd.x/=fwdLen;camFwd.z/=fwdLen;}
-
-            // STEP 2: Get camera right flattened to ground plane
-            // right = forward cross up (world up = 0,1,0)
             Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
-
-            // STEP 3: joystick input
-            // joyX = g_joyDX/100: positive = finger went RIGHT
-            // joyY = g_joyDY/100: positive = finger went DOWN (screen coords)
-            // We want: joystick UP (joyY negative) = move FORWARD
-            //          joystick DOWN (joyY positive) = move BACKWARD
-            //          joystick RIGHT (joyX positive) = move RIGHT
-            //          joystick LEFT (joyX negative) = move LEFT
-            float moveForward = -joyY; // invert Y because screen Y is flipped
-            float moveRight   =  joyX;
-
-            // STEP 4: normalize diagonal so speed is consistent
-            float inputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
-            if(inputLen>1.f){moveForward/=inputLen;moveRight/=inputLen;}
-
-            // STEP 5: apply movement in camera-relative space
-            pos.x += (camFwd.x*moveRight + camRight.x*moveForward)*spd*3.f;
-            pos.z += (camFwd.z*moveRight + camRight.z*moveForward)*spd*3.f;
+            float moveForward=-joyY;
+            float moveRight=joyX;
+            float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
+            if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
+            Vector3 moveDir;
+            moveDir.x=camFwd.x*moveForward+camRight.x*moveRight;
+            moveDir.y=0.f;
+            moveDir.z=camFwd.z*moveForward+camRight.z*moveRight;
+            pos.x+=moveDir.x*spd*3.f;
+            pos.z+=moveDir.z*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
