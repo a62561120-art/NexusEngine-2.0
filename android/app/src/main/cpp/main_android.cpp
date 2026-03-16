@@ -292,8 +292,8 @@ public:
             // camera forward and right are correct, just apply directly
             // forward = camFwd * moveForward
             // strafe  = camRight * moveRight
-            pos.x+=(camFwd.x*moveForward+camRight.x*moveRight)*spd*3.f;
-            pos.z+=(camFwd.z*moveForward+camRight.z*moveRight)*spd*3.f;
+            pos.x+=(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
+            pos.z+=(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
