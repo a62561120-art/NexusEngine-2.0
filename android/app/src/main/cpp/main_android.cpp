@@ -285,15 +285,12 @@ public:
             Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
             // joyX = right, joyY = down on screen
             // joystick up = -joyY = forward, joystick right = joyX = right
-            float moveForward=joyY;
+            float moveForward=-joyY;
             float moveRight=joyX;
             float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
             if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
-            // camera forward and right are correct, just apply directly
-            // forward = camFwd * moveForward
-            // strafe  = camRight * moveRight
-            pos.x+=(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
-            pos.z+=(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
+            pos.x+=(camFwd.x*moveForward+camRight.x*moveRight)*spd*3.f;
+            pos.z+=(camFwd.z*moveForward+camRight.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
