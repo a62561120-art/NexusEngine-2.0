@@ -292,13 +292,8 @@ public:
             // camera forward and right are correct, just apply directly
             // forward = camFwd * moveForward
             // strafe  = camRight * moveRight
-            float fx=camRight.x*moveForward+camFwd.x*moveRight;
-            float fz=camRight.z*moveForward+camFwd.z*moveRight;
-            // dot with camFwd to detect if we need to flip
-            float check=camFwd.x*camRight.z-camFwd.z*camRight.x;
-            if(check<0){fx=-fx;fz=-fz;}
-            pos.x+=fx*spd*3.f;
-            pos.z+=fz*spd*3.f;
+            pos.x+=-(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
+            pos.z+=-(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
