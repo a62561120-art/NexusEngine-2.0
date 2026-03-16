@@ -292,8 +292,10 @@ public:
             // camera forward and right are correct, just apply directly
             // forward = camFwd * moveForward
             // strafe  = camRight * moveRight
-            pos.x+=-(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
-            pos.z+=-(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
+            // flip sign based on which quadrant camera faces
+            float sign=(camFwd.x*camRight.z > camFwd.z*camRight.x) ? 1.f : -1.f;
+            pos.x+=sign*(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
+            pos.z+=sign*(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
