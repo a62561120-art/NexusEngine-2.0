@@ -292,11 +292,8 @@ public:
             // camera forward and right are correct, just apply directly
             // forward = camFwd * moveForward
             // strafe  = camRight * moveRight
-            // Detect if movement is flipped based on camera facing
-            // When camFwd.z is positive, movement needs to be negated
-            float flip = (camFwd.z >= 0.f) ? -1.f : 1.f;
-            pos.x+=flip*(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
-            pos.z+=flip*(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
+            pos.x+=(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
+            pos.z+=(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
