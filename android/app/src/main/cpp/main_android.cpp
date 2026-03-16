@@ -285,7 +285,7 @@ public:
             Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
             // joyX = right, joyY = down on screen
             // joystick up = -joyY = forward, joystick right = joyX = right
-            float moveForward=joyY;
+            float moveForward=-joyY;
             float moveRight=joyX;
             float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
             if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
