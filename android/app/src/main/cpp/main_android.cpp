@@ -283,16 +283,17 @@ public:
             if(fwdLen<0.001f){camFwd={0.f,0.f,-1.f};}
             else{camFwd.x/=fwdLen;camFwd.z/=fwdLen;}
             Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
-            float moveForward=-joyY;
+            // joyX = right, joyY = down on screen
+            // joystick up = -joyY = forward, joystick right = joyX = right
+            float moveForward=joyY;
             float moveRight=joyX;
             float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
             if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
-            Vector3 moveDir;
-            moveDir.x=camFwd.x*moveForward+camRight.x*moveRight;
-            moveDir.y=0.f;
-            moveDir.z=camFwd.z*moveForward+camRight.z*moveRight;
-            pos.x+=moveDir.x*spd*3.f;
-            pos.z+=moveDir.z*spd*3.f;
+            // camera forward and right are correct, just apply directly
+            // forward = camFwd * moveForward
+            // strafe  = camRight * moveRight
+            pos.x+=(camFwd.x*moveForward+camRight.x*moveRight)*spd*3.f;
+            pos.z+=(camFwd.z*moveForward+camRight.z*moveRight)*spd*3.f;
         }
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
