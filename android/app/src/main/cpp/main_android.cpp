@@ -278,6 +278,7 @@ public:
         float inputMagnitude=sqrtf(joyX*joyX+joyY*joyY);
         if(inputMagnitude>deadzone){
             Vector3 camFwd=GetFwd();
+            camFwd.x=-camFwd.x; camFwd.z=-camFwd.z; // negate to match LookAt view space
             camFwd.y=0.f;
             float fwdLen=sqrtf(camFwd.x*camFwd.x+camFwd.z*camFwd.z);
             if(fwdLen<0.001f){camFwd={0.f,0.f,-1.f};}
