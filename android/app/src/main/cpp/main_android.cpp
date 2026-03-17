@@ -700,7 +700,11 @@ static int32_t HandleInput(android_app* app, AInputEvent* event) {
         // Joystick zone bottom-left
         bool inJoy=(tx<220.f&&ty>(float)g_vpH-220.f);
         if(action==AMOTION_EVENT_ACTION_DOWN&&inJoy){
-            g_joyActive=true;g_joyBaseX=tx;g_joyBaseY=ty;g_joyDX=0;g_joyDY=0;
+            g_joyActive=true;
+            float joySize=200.f;
+            g_joyBaseX=10.f+joySize*0.5f;
+            g_joyBaseY=(float)g_vpH-joySize*0.5f-10.f;
+            g_joyDX=0;g_joyDY=0;
         } else if(action==AMOTION_EVENT_ACTION_MOVE&&g_joyActive){
             g_joyDX=tx-g_joyBaseX;g_joyDY=ty-g_joyBaseY;
         } else if(action==AMOTION_EVENT_ACTION_UP&&g_joyActive){
