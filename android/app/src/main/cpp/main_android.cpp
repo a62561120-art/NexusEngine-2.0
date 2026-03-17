@@ -497,6 +497,15 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     }
     ImGui::SameLine(0,30);
     ImGui::Text("FPS: %.0f jX:%.2f jY:%.2f", fps, g_joyDX, g_joyDY);
+    // Direction debug
+    Vector3 fwd=g_edCam.GetFwd();
+    const char* dir="?";
+    if(fwd.z<-0.5f) dir="FORWARD(-Z)";
+    else if(fwd.z>0.5f) dir="BACKWARD(+Z)";
+    else if(fwd.x>0.5f) dir="RIGHT(+X)";
+    else if(fwd.x<-0.5f) dir="LEFT(-X)";
+    ImGui::SameLine();
+    ImGui::Text("Dir:%s fwd(%.1f,%.1f)", dir, fwd.x, fwd.z);
     ImGui::End();
 
     ImGui::SetNextWindowPos(ImVec2(0,50));
