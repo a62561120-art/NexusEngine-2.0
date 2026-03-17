@@ -496,7 +496,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGui::EndMenu();
     }
     ImGui::SameLine(0,30);
-    ImGui::Text("FPS: %.0f", fps);
+    ImGui::Text("FPS: %.0f jX:%.2f jY:%.2f", fps, g_joyDX, g_joyDY);
     ImGui::End();
 
     ImGui::SetNextWindowPos(ImVec2(0,50));
