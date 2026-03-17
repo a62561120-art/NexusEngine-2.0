@@ -285,7 +285,7 @@ public:
             // Derive right from yaw directly - avoids cross product sign issues
             const float D2R=3.14159265f/180.f;
             float rightYaw=(yaw+90.f)*D2R;
-            Vector3 camRight={-std::cos(rightYaw),0.f,-std::sin(rightYaw)};
+            Vector3 camRight={std::cos(rightYaw),0.f,std::sin(rightYaw)};
             // joyX = right, joyY = down on screen
             // joystick up = -joyY = forward, joystick right = joyX = right
             float moveForward=-joyY;
