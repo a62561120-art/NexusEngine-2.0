@@ -282,7 +282,10 @@ public:
             float fwdLen=sqrtf(camFwd.x*camFwd.x+camFwd.z*camFwd.z);
             if(fwdLen<0.001f){camFwd={0.f,0.f,-1.f};}
             else{camFwd.x/=fwdLen;camFwd.z/=fwdLen;}
-            Vector3 camRight=camFwd.Cross({0.f,1.f,0.f}).Normalized();
+            // Derive right from yaw directly - avoids cross product sign issues
+            const float D2R=3.14159265f/180.f;
+            float rightYaw=(g_edCam.yaw+90.f)*D2R;
+            Vector3 camRight={std::cos(rightYaw),0.f,std::sin(rightYaw)};
             // joyX = right, joyY = down on screen
             // joystick up = -joyY = forward, joystick right = joyX = right
             float moveForward=-joyY;
