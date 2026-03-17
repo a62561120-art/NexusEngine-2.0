@@ -289,7 +289,7 @@ public:
             // joyX = right, joyY = down on screen
             // joystick up = -joyY = forward, joystick right = joyX = right
             float moveForward=-joyY;
-            float moveRight=joyX;
+            float moveRight=-joyX;
             float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
             if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
             pos.x+=(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
