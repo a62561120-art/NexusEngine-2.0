@@ -131,9 +131,7 @@ static Scene*           g_scene    = nullptr;
 static GameObject*      g_selected = nullptr;
 static float g_lastTX=0, g_lastTY=0;
 static bool  g_viewportDrag=false;
-static float g_joyBaseX=0,g_joyBaseY=0;
-static float g_joyDX=0,g_joyDY=0;
-static bool  g_joyActive=false;
+
 
 // ============================================================
 //  Timing
@@ -268,33 +266,12 @@ public:
         ApplyRot();
     }
 
-    float joyX=0,joyY=0;
     void Update(float dt) {
         if (!go||!cam) return;
         float spd=moveSpeed*dt;
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
-        float deadzone=0.1f;
-        float inputMagnitude=sqrtf(joyX*joyX+joyY*joyY);
-        if(inputMagnitude>deadzone){
-            Vector3 camFwd=GetFwd();
-            camFwd.y=0.f;
-            float fwdLen=sqrtf(camFwd.x*camFwd.x+camFwd.z*camFwd.z);
-            if(fwdLen<0.001f){camFwd={0.f,0.f,-1.f};}
-            else{camFwd.x/=fwdLen;camFwd.z/=fwdLen;}
-            // Derive right from yaw directly - avoids cross product sign issues
-            const float D2R=3.14159265f/180.f;
-            float rightYaw=(yaw+90.f)*D2R;
-            Vector3 camRight={std::cos(rightYaw),0.f,std::sin(rightYaw)};
-            // joyX = right, joyY = down on screen
-            // joystick up = -joyY = forward, joystick right = joyX = right
-            float moveForward=-joyY;
-            float moveRight=-joyX;
-            float rawInputLen=sqrtf(moveForward*moveForward+moveRight*moveRight);
-            if(rawInputLen>1.f){moveForward/=rawInputLen;moveRight/=rawInputLen;}
-            pos.x+=(camRight.x*moveForward+camFwd.x*moveRight)*spd*3.f;
-            pos.z+=(camRight.z*moveForward+camFwd.z*moveRight)*spd*3.f;
-        }
+
         if(moveF) pos=pos+fwd*spd;
         if(moveB) pos=pos-fwd*spd;
         if(moveL) pos=pos-right*spd;
@@ -564,36 +541,28 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGui::End();
     }
 
-    // Joystick - drawn with ImDrawList
-    float joySize=200.f;
-    ImGui::SetNextWindowPos(ImVec2(10,(float)h-joySize-10));
-    ImGui::SetNextWindowSize(ImVec2(joySize,joySize));
-    ImGui::SetNextWindowBgAlpha(0.3f);
-    ImGui::Begin("##joy",nullptr,
+    // Move pad
+    float padSz=160.f;
+    ImGui::SetNextWindowPos(ImVec2(0,(float)h-padSz-10));
+    ImGui::SetNextWindowSize(ImVec2(padSz+20,padSz+20));
+    ImGui::Begin("MOVE",nullptr,
         ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|
-        ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar|
-        ImGuiWindowFlags_NoInputs);
-    ImDrawList* dl=ImGui::GetWindowDrawList();
-    ImVec2 wp=ImGui::GetWindowPos();
-    float cx=wp.x+joySize*0.5f,cy=wp.y+joySize*0.5f;
-    float outerR=joySize*0.44f,innerR=joySize*0.17f;
-    dl->AddCircle(ImVec2(cx,cy),outerR,IM_COL32(80,140,255,150),32,2.5f);
-    float kx=cx,ky=cy;
-    if(g_joyActive){
-        float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
-        float clamp=std::min(len,outerR);
-        if(len>0){kx+=g_joyDX/len*clamp;ky+=g_joyDY/len*clamp;}
-    }
-    dl->AddCircleFilled(ImVec2(kx,ky),innerR,IM_COL32(100,180,255,220));
+        ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar);
+    ImGui::Text("MOVE");
+    float bsz=50.f;
+    ImGui::SetCursorPos(ImVec2(bsz,5));
+    ImGui::Button("^##mf",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveF=true;
+    ImGui::SetCursorPos(ImVec2(0,bsz));
+    ImGui::Button("<##ml",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveL=true;
+    ImGui::SameLine();
+    ImGui::Button("v##md",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveD=true;
+    ImGui::SameLine();
+    ImGui::Button(">##mr",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveR=true;
+    ImGui::SetCursorPos(ImVec2(0,bsz*2));
+    ImGui::Button("Up##mu",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveU=true;
+    ImGui::SameLine();
+    ImGui::Button("Dn##mb",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveB=true;
     ImGui::End();
-    // Apply joystick to camera movement
-    if(g_joyActive){
-        float len=sqrtf(g_joyDX*g_joyDX+g_joyDY*g_joyDY);
-        if(len>12.f){
-            float nx=g_joyDX/len,ny=g_joyDY/len;
-            edCam.joyX=std::max(-1.f,std::min(1.f,g_joyDX/100.f));
-            edCam.joyY=std::max(-1.f,std::min(1.f,g_joyDY/100.f));
-        }
     }
 
 }
@@ -709,19 +678,7 @@ static int32_t HandleInput(android_app* app, AInputEvent* event) {
         int action=AMotionEvent_getAction(event)&AMOTION_EVENT_ACTION_MASK;
         float tx=AMotionEvent_getX(event,0);
         float ty=AMotionEvent_getY(event,0);
-        // Joystick zone bottom-left
-        bool inJoy=(tx<220.f&&ty>(float)g_vpH-220.f);
-        if(action==AMOTION_EVENT_ACTION_DOWN&&inJoy){
-            g_joyActive=true;
-            float joySize=200.f;
-            g_joyBaseX=10.f+joySize*0.5f;
-            g_joyBaseY=(float)g_vpH-joySize*0.5f-10.f;
-            g_joyDX=0;g_joyDY=0;
-        } else if(action==AMOTION_EVENT_ACTION_MOVE&&g_joyActive){
-            g_joyDX=tx-g_joyBaseX;g_joyDY=ty-g_joyBaseY;
-        } else if(action==AMOTION_EVENT_ACTION_UP&&g_joyActive){
-            g_joyActive=false;g_joyDX=0;g_joyDY=0;
-        }
+
         bool inUI=(tx<200&&ty>50&&ty<g_vpH*0.5f+50)||
                   (tx>g_vpW-210&&ty>50&&ty<g_vpH*0.5f+50)||
                   (tx<200&&ty>g_vpH-180)||
