@@ -272,15 +272,10 @@ public:
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
 
-        // Use camera transform for correct directions
-        Vector3 camF=GetFwd(); camF.y=0;
-        float fl=sqrtf(camF.x*camF.x+camF.z*camF.z);
-        if(fl>0.001f){camF.x/=fl;camF.z/=fl;}
-        Vector3 camR=camF.Cross({0,1,0}).Normalized();
-        if(moveF) pos=pos+camF*spd;
-        if(moveB) pos=pos-camF*spd;
-        if(moveR) pos=pos+camR*spd;
-        if(moveL) pos=pos-camR*spd;
+        if(moveF) pos=pos+fwd*spd;
+        if(moveB) pos=pos-fwd*spd;
+        if(moveR) pos=pos+right*spd;
+        if(moveL) pos=pos-right*spd;
         if(moveU) pos.y+=spd;
         if(moveD) pos.y-=spd;
         go->GetTransform()->SetPosition(pos);
