@@ -285,7 +285,6 @@ public:
         if(lookU){pitch=std::min(pitch+ls,89.f);ApplyRot();}
         if(lookD){pitch=std::max(pitch-ls,-89.f);ApplyRot();}
         moveF=moveB=moveL=moveR=moveU=moveD=false;
-        joyX=0;joyY=0;
         lookL=lookR=lookU=lookD=false;
     }
 
@@ -476,7 +475,7 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
         ImGui::EndMenu();
     }
     ImGui::SameLine(0,30);
-    ImGui::Text("FPS: %.0f jX:%.2f jY:%.2f", fps, g_joyDX, g_joyDY);
+    ImGui::Text("FPS: %.0f", fps);
     // Direction debug
     Vector3 fwd=g_edCam.GetFwd();
     const char* dir="?";
