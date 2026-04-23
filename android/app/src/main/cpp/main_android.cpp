@@ -272,10 +272,14 @@ public:
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
 
-        if(moveF) pos=pos+fwd*spd;
-        if(moveB) pos=pos-fwd*spd;
-        if(moveR) pos=pos+right*spd;
-        if(moveL) pos=pos-right*spd;
+        const float D2R2=3.14159265f/180.f;
+        float yr2=yaw*D2R2;
+        float fx=std::cos(yr2), fz=std::sin(yr2);
+        float rx=-fz, rz=fx;
+        if(moveF){pos.x+=fx*spd;pos.z+=fz*spd;}
+        if(moveB){pos.x-=fx*spd;pos.z-=fz*spd;}
+        if(moveR){pos.x+=rx*spd;pos.z+=rz*spd;}
+        if(moveL){pos.x-=rx*spd;pos.z-=rz*spd;}
         if(moveU) pos.y+=spd;
         if(moveD) pos.y-=spd;
         go->GetTransform()->SetPosition(pos);
