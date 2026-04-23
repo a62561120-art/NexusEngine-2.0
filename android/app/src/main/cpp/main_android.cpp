@@ -562,7 +562,6 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     ImGui::SameLine();
     ImGui::Button("Dn##mb",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveB=true;
     ImGui::End();
-    }
 
 }
 
