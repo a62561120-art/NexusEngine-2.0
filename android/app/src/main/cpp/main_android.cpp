@@ -272,10 +272,15 @@ public:
         Vector3 fwd=GetFwd(), right=GetRight();
         Vector3 pos=go->GetTransform()->GetPosition();
 
-        if(moveF) pos=pos+fwd*spd;
-        if(moveB) pos=pos-fwd*spd;
-        if(moveL) pos=pos-right*spd;
-        if(moveR) pos=pos+right*spd;
+        // Use camera transform for correct directions
+        Vector3 camF=GetFwd(); camF.y=0;
+        float fl=sqrtf(camF.x*camF.x+camF.z*camF.z);
+        if(fl>0.001f){camF.x/=fl;camF.z/=fl;}
+        Vector3 camR=camF.Cross({0,1,0}).Normalized();
+        if(moveF) pos=pos+camF*spd;
+        if(moveB) pos=pos-camF*spd;
+        if(moveR) pos=pos+camR*spd;
+        if(moveL) pos=pos-camR*spd;
         if(moveU) pos.y+=spd;
         if(moveD) pos.y-=spd;
         go->GetTransform()->SetPosition(pos);
@@ -541,14 +546,14 @@ static void DrawEditorUI(Scene* scene, EditorCamAndroid& edCam,
     }
 
     // Move pad
-    float padSz=160.f;
+    float padSz=220.f;
     ImGui::SetNextWindowPos(ImVec2(0,(float)h-padSz-10));
-    ImGui::SetNextWindowSize(ImVec2(padSz+20,padSz+20));
+    ImGui::SetNextWindowSize(ImVec2(padSz+20,padSz+30));
     ImGui::Begin("MOVE",nullptr,
         ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|
         ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoScrollbar);
     ImGui::Text("MOVE");
-    float bsz=50.f;
+    float bsz=80.f;
     ImGui::SetCursorPos(ImVec2(bsz,5));
     ImGui::Button("^##mf",ImVec2(bsz,bsz)); if(ImGui::IsItemActive()) edCam.moveF=true;
     ImGui::SetCursorPos(ImVec2(0,bsz));
